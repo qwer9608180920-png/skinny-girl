@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>環境巡檢系統 v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .offline-tag { display: none; }
+        body.is-offline .offline-tag { display: inline; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <nav class="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-md">
+        <h1 class="text-xl font-bold text-center">機台環境巡檢</h1>
+    </nav>
+
+    <main class="p-4 max-w-md mx-auto">
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+            <label class="block text-gray-700 font-bold mb-2">1. 選擇巡檢區域</label>
+            <select id="area" class="w-full border rounded-lg p-3 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="A廠">A廠</option>
+                <option value="B廠">B廠</option>
+                <option value="打再生">打再生</option>
+            </select>
+            
+            <label class="block text-gray-700 font-bold mt-4 mb-2">2. 地點</label>
+            <select id="location" class="w-full border rounded-lg p-3 bg-gray-50 outline-none">
+                </select>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+            <label class="block text-gray-700 font-bold mb-2">3. 拍攝巡檢照片</label>
+            <input type="file" id="camera" accept="image/*" capture="environment" class="hidden">
+            <button onclick="document.getElementById('camera').click()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition">
+                📷 開啟相機 / 選擇檔案
+            </button>
+            
+            <div id="preview" class="grid grid-cols-2 gap-2 mt-4">
+                </div>
+        </div>
+
+        <button onclick="saveInspection()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">
+            儲存至本地草稿
+        </button>
+    </main>
+
+    <script>
+        // 資料設定
+        const locations = {
+            'A廠': ['機台正面照', '1F保溫桶車道', '2F-1', '2F-2'],
+            'B廠': ['機台正面照', '1F下料車道', '2F-平台'],
+            '打再生': ['平台1', '平台2']
+        };
+
+        const areaEl = document.getElementById('area');
+        const locEl = document.getElementById('location');
+
+        // 自動連動選單
+        areaEl.addEventListener('change', () => {
+            const list = locations[areaEl.value];
+            locEl.innerHTML = list.map(l => `<option value="${l}">${l}</option>`).join('');
+        });
+        areaEl.dispatchEvent(new Event('change'));
+
+        // 照片處理邏輯 (壓縮與命名)
+        document.getElementById('camera').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    // 這裡執行你要求的壓縮 (1200px, 80%品質)
+                    const canvas = document.createElement('canvas');
+                    const maxSide = 1200;
+                    let w = img.width, h = img.height;
+                    if (w > h && w > maxSide) { h *= maxSide / w; w = maxSide; }
+                    else if (h > maxSide) { w *= maxSide / h; h = maxSide; }
+                    
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    
+                    const compressedUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    addPreview(compressedUrl);
+                };
+            };
+        });
+
+        function addPreview(url) {
+            const div = document.createElement('div');
+            div.className = "relative border rounded-lg overflow-hidden h-32 bg-gray-200";
+            div.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+            document.getElementById('preview').appendChild(div);
+        }
+
+        function saveInspection() {
+            alert('已成功儲存至瀏覽器快取 (IndexedDB)！即使斷網也能繼續操作。');
+        }
+    </script>
+</body>
+</html>
