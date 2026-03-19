@@ -3,104 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>環境巡檢系統 v1.0</title>
+    <title>機台環境巡檢系統 v1.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .offline-tag { display: none; }
-        body.is-offline .offline-tag { display: inline; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .sidebar-item.active { background-color: rgba(59, 130, 246, 0.1); border-right: 4px solid #3b82f6; color: #3b82f6; }
+        .hidden-page { display: none; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-[#f8fafc] flex min-h-screen">
 
-    <nav class="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-md">
-        <h1 class="text-xl font-bold text-center">機台環境巡檢</h1>
-    </nav>
-
-    <main class="p-4 max-w-md mx-auto">
-        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-            <label class="block text-gray-700 font-bold mb-2">1. 選擇巡檢區域</label>
-            <select id="area" class="w-full border rounded-lg p-3 bg-gray-50 outline-none focus:ring-2 focus:ring-blue-400">
-                <option value="A廠">A廠</option>
-                <option value="B廠">B廠</option>
-                <option value="打再生">打再生</option>
-            </select>
-            
-            <label class="block text-gray-700 font-bold mt-4 mb-2">2. 地點</label>
-            <select id="location" class="w-full border rounded-lg p-3 bg-gray-50 outline-none">
-                </select>
+    <aside class="w-64 bg-[#1e293b] text-slate-300 flex-shrink-0 flex flex-col shadow-xl z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-700">
+            <div class="bg-blue-600 p-2 rounded-lg text-white shadow-lg">
+                <i class="fas fa-industry text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-white text-sm tracking-wide">環境巡檢系統</h1>
+                <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Inspection Manager</p>
+            </div>
         </div>
+        
+        <nav class="flex-1 mt-4 overflow-y-auto">
+            <a href="#" onclick="showPage('dashboard')" class="sidebar-item active flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-chart-line w-5"></i> 儀表板
+            </a>
+            <a href="#" onclick="showPage('inspect')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-edit w-5"></i> 巡檢填報
+            </a>
+            <a href="#" onclick="showPage('records')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-database w-5"></i> 資料查詢
+            </a>
+            <a href="#" onclick="showPage('pending')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-cloud-upload-alt w-5"></i> 待上傳清單
+            </a>
+            <div class="border-t border-slate-700 my-2 mx-4"></div>
+            <a href="#" onclick="showPage('admin-areas')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-map-marked-alt w-5"></i> 區域管理
+            </a>
+            <a href="#" onclick="showPage('admin-reporters')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-users-cog w-5"></i> 提報人管理
+            </a>
+            <a href="#" onclick="showPage('admin-users')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-user-shield w-5"></i> 帳號管理
+            </a>
+            <a href="#" onclick="showPage('admin-logs')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-history w-5"></i> 操作紀錄
+            </a>
+            <a href="#" onclick="showPage('settings')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
+                <i class="fas fa-sliders-h w-5"></i> 系統設定
+            </a>
+        </nav>
 
-        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-            <label class="block text-gray-700 font-bold mb-2">3. 拍攝巡檢照片</label>
-            <input type="file" id="camera" accept="image/*" capture="environment" class="hidden">
-            <button onclick="document.getElementById('camera').click()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition">
-                📷 開啟相機 / 選擇檔案
-            </button>
-            
-            <div id="preview" class="grid grid-cols-2 gap-2 mt-4">
+        <div class="p-4 bg-[#0f172a] flex items-center justify-between border-t border-slate-800">
+            <div>
+                <p class="font-bold text-slate-100 text-xs">系統管理員</p>
+                <span class="bg-slate-700 text-[10px] px-1.5 py-0.5 rounded text-slate-400">管理者</span>
+            </div>
+            <i class="fas fa-sign-out-alt text-slate-500 cursor-pointer hover:text-white"></i>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b px-8 py-4 flex justify-between items-center shadow-sm">
+            <h2 id="page-title" class="text-xl font-bold text-slate-800">儀表板</h2>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-xs text-slate-400">2026-03-19</p>
+                    <p class="text-sm font-medium text-slate-600">系統管理員 <span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-0.5 rounded-full ml-1">管理者</span></p>
                 </div>
-        </div>
+            </div>
+        </header>
 
-        <button onclick="saveInspection()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">
-            儲存至本地草稿
-        </button>
+        <div class="p-8 overflow-y-auto flex-1">
+            
+            <section id="page-dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i class="fas fa-tasks"></i></div>
+                        </div>
+                        <p class="text-slate-500 text-sm">本週巡檢</p>
+                        <h3 class="text-3xl font-bold">8</h3>
+                    </div>
+                    </div>
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b flex justify-between items-center">
+                        <h4 class="font-bold">最近巡檢紀錄</h4>
+                        <button onclick="showPage('inspect')" class="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ 新增巡檢</button>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500">
+                            <tr>
+                                <th class="px-6 py-3">日期</th><th class="px-6 py-3">區域</th><th class="px-6 py-3">提報人</th><th class="px-6 py-3">進度</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y border-t">
+                            <tr>
+                                <td class="px-6 py-4">2026-03-15</td><td class="px-6 py-4">A廠 1F</td><td class="px-6 py-4">王大明</td>
+                                <td class="px-6 py-4"><span class="text-green-600 font-medium"><span class="status-dot bg-green-500"></span>已結案</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="page-records" class="hidden-page space-y-4">
+                <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-wrap gap-4 items-end">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-xs text-slate-500 mb-1">搜尋地點、提報人...</label>
+                        <input type="text" class="w-full border rounded-lg p-2 text-sm bg-slate-50" placeholder="關鍵字...">
+                    </div>
+                    <select class="border rounded-lg p-2 text-sm bg-slate-50"><option>全部區域</option></select>
+                    <select class="border rounded-lg p-2 text-sm bg-slate-50"><option>全部進度</option></select>
+                    <div class="flex gap-2">
+                        <button class="bg-slate-100 px-4 py-2 rounded-lg text-sm border hover:bg-slate-200"><i class="fas fa-file-excel mr-2 text-green-600"></i>Excel</button>
+                        <button class="bg-slate-100 px-4 py-2 rounded-lg text-sm border hover:bg-slate-200"><i class="fas fa-file-pdf mr-2 text-red-600"></i>PDF</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-sm min-w-[1000px]">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-medium">
+                            <tr>
+                                <th class="px-6 py-4">日期</th><th class="px-6 py-4">區域</th><th class="px-6 py-4">地點</th><th class="px-6 py-4">提報人</th><th class="px-6 py-4">狀態</th><th class="px-6 py-4">照片</th><th class="px-6 py-4">進度</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-6 py-4">2026-03-04</td><td class="px-6 py-4 font-medium">A廠 2F</td><td class="px-6 py-4">2F-1</td><td class="px-6 py-4 text-slate-600">李小華</td>
+                                <td class="px-6 py-4"><span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs">漏油</span></td>
+                                <td class="px-6 py-4 text-blue-500"><i class="fas fa-image"></i> 2</td>
+                                <td class="px-6 py-4"><span class="text-red-600 font-bold flex items-center"><span class="status-dot bg-red-500"></span>未改善</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="page-admin-reporters" class="hidden-page max-w-4xl mx-auto space-y-6">
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+                    <h4 class="font-bold mb-4">新增提報人</h4>
+                    <div class="flex gap-4">
+                        <input type="text" id="new-reporter-name" class="flex-1 border rounded-lg p-2 bg-slate-50" placeholder="姓名">
+                        <button onclick="addReporter()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">+ 新增</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50"><tr><th class="px-6 py-4">姓名</th><th class="px-6 py-4">狀態</th><th class="px-6 py-4">操作</th></tr></thead>
+                        <tbody id="reporter-list" class="divide-y">
+                            <tr><td class="px-6 py-4">王大明</td><td class="px-6 py-4"><span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">啟用</span></td><td class="px-6 py-4"><button class="text-slate-400 hover:text-red-500"><i class="fas fa-user-slash mr-1"></i>停用</button></td></tr>
+                        </tbody>
+                    </table>
+                    <p class="p-4 text-center text-xs text-slate-400 border-t">提報人僅可停用，不可刪除，以保留歷史紀錄完整性。</p>
+                </div>
+            </section>
+
+            <section id="page-inspect" class="hidden-page max-w-2xl mx-auto space-y-6">
+                <div class="bg-white rounded-xl border shadow-md p-6 space-y-6">
+                    <div class="flex justify-between items-center"><span class="font-bold text-lg">巡檢位置</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full"><i class="fas fa-wifi"></i> 線上模式</span></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs text-slate-500 mb-1">區域 *</label><select id="inspect-area" onchange="updateLocations()" class="w-full border rounded-lg p-3 bg-slate-50"></select></div>
+                        <div><label class="block text-xs text-slate-500 mb-1">地點 *</label><select id="inspect-loc" class="w-full border rounded-lg p-3 bg-slate-50"></select></div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-2">巡檢結果</label>
+                        <div class="flex gap-4">
+                            <button id="btn-ok" onclick="setResult('正常')" class="flex-1 py-4 rounded-xl border-2 border-green-500 bg-green-50 text-green-700 font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-check-circle"></i> 正常</button>
+                            <button id="btn-err" onclick="setResult('異常')" class="flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-400 font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-exclamation-triangle"></i> 異常</button>
+                        </div>
+                    </div>
+                    <div><label class="block text-xs text-slate-500 mb-1">照片上傳</label><div class="border-2 border-dashed rounded-xl p-8 text-center bg-slate-50 text-slate-400 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition" onclick="document.getElementById('cam-input').click()"><i class="fas fa-camera text-3xl mb-2"></i><br>開啟相機 / 選擇檔案<input type="file" id="cam-input" class="hidden" multiple accept="image/*"></div></div>
+                    <button class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition">儲存並上傳巡檢資料</button>
+                </div>
+            </section>
+
+        </div>
     </main>
 
     <script>
         // 資料設定
-        const locations = {
-            'A廠': ['機台正面照', '1F保溫桶車道', '2F-1', '2F-2'],
-            'B廠': ['機台正面照', '1F下料車道', '2F-平台'],
+        const siteData = {
+            'A廠': ['機台正面照', '1F保溫桶車道', '1F下料車道', '2F-1', '2F-平台', '3F-1', '4F-1'],
+            'B廠': ['機台正面照', '1F下料車道', '1F保溫桶車道', '2F-平台', '3F-1', '90-1'],
             '打再生': ['平台1', '平台2']
         };
 
-        const areaEl = document.getElementById('area');
-        const locEl = document.getElementById('location');
-
-        // 自動連動選單
-        areaEl.addEventListener('change', () => {
-            const list = locations[areaEl.value];
-            locEl.innerHTML = list.map(l => `<option value="${l}">${l}</option>`).join('');
-        });
-        areaEl.dispatchEvent(new Event('change'));
-
-        // 照片處理邏輯 (壓縮與命名)
-        document.getElementById('camera').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    // 這裡執行你要求的壓縮 (1200px, 80%品質)
-                    const canvas = document.createElement('canvas');
-                    const maxSide = 1200;
-                    let w = img.width, h = img.height;
-                    if (w > h && w > maxSide) { h *= maxSide / w; w = maxSide; }
-                    else if (h > maxSide) { w *= maxSide / h; h = maxSide; }
-                    
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    
-                    const compressedUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    addPreview(compressedUrl);
-                };
+        function showPage(pageId) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden-page'));
+            document.getElementById('page-' + pageId).classList.remove('hidden-page');
+            
+            // 更新 UI 狀態
+            const navMap = {
+                'dashboard': '儀表板', 'inspect': '巡檢填報', 'records': '資料查詢',
+                'admin-areas': '區域管理', 'admin-reporters': '提報人管理',
+                'admin-users': '帳號管理', 'admin-logs': '操作紀錄', 'settings': '系統設定'
             };
-        });
-
-        function addPreview(url) {
-            const div = document.createElement('div');
-            div.className = "relative border rounded-lg overflow-hidden h-32 bg-gray-200";
-            div.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
-            document.getElementById('preview').appendChild(div);
+            document.getElementById('page-title').innerText = navMap[pageId] || '系統';
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                el.classList.toggle('active', el.innerText.trim() === navMap[pageId]);
+            });
         }
 
-        function saveInspection() {
-            alert('已成功儲存至瀏覽器快取 (IndexedDB)！即使斷網也能繼續操作。');
+        function updateLocations() {
+            const area = document.getElementById('inspect-area').value;
+            const locSelect = document.getElementById('inspect-loc');
+            locSelect.innerHTML = siteData[area].map(l => `<option>${l}</option>`).join('');
         }
+
+        function setResult(res) {
+            const isOk = res === '正常';
+            document.getElementById('btn-ok').className = isOk ? "flex-1 py-4 rounded-xl border-2 border-green-500 bg-green-50 text-green-700 font-bold flex items-center justify-center gap-2" : "flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-400 font-bold flex items-center justify-center gap-2";
+            document.getElementById('btn-err').className = !isOk ? "flex-1 py-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 font-bold flex items-center justify-center gap-2" : "flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-400 font-bold flex items-center justify-center gap-2";
+        }
+
+        // 初始化
+        window.onload = () => {
+            const areaSel = document.getElementById('inspect-area');
+            areaSel.innerHTML = Object.keys(siteData).map(a => `<option>${a}</option>`).join('');
+            updateLocations();
+        };
     </script>
 </body>
 </html>
