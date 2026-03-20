@@ -3,229 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>機台環境巡檢系統 v1.0</title>
+    <title>機台巡檢系統管理端</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; }
-        .sidebar-item.active { background-color: rgba(59, 130, 246, 0.1); border-right: 4px solid #3b82f6; color: #3b82f6; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; }
+        .sidebar-item.active { background-color: #3b82f6; color: white; border-radius: 8px; }
         .hidden-page { display: none; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
     </style>
 </head>
-<body class="bg-[#f8fafc] flex min-h-screen">
+<body class="flex min-h-screen">
 
-    <aside class="w-64 bg-[#1e293b] text-slate-300 flex-shrink-0 flex flex-col shadow-xl z-20">
-        <div class="p-6 flex items-center gap-3 border-b border-slate-700">
-            <div class="bg-blue-600 p-2 rounded-lg text-white shadow-lg">
-                <i class="fas fa-industry text-xl"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-white text-sm tracking-wide">環境巡檢系統</h1>
-                <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Inspection Manager</p>
-            </div>
+    <aside class="w-64 bg-[#1e293b] text-slate-300 p-4 flex-shrink-0 flex flex-col shadow-xl">
+        <div class="flex items-center gap-3 px-2 mb-8 mt-2">
+            <div class="bg-blue-500 p-2 rounded-lg text-white"><i class="fas fa-clipboard-check text-xl"></i></div>
+            <span class="font-bold text-white tracking-wider text-lg">巡檢管理系統</span>
         </div>
         
-        <nav class="flex-1 mt-4 overflow-y-auto">
-            <a href="#" onclick="showPage('dashboard')" class="sidebar-item active flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-chart-line w-5"></i> 儀表板
-            </a>
-            <a href="#" onclick="showPage('inspect')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-edit w-5"></i> 巡檢填報
-            </a>
-            <a href="#" onclick="showPage('records')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-database w-5"></i> 資料查詢
-            </a>
-            <a href="#" onclick="showPage('pending')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-cloud-upload-alt w-5"></i> 待上傳清單
-            </a>
-            <div class="border-t border-slate-700 my-2 mx-4"></div>
-            <a href="#" onclick="showPage('admin-areas')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-map-marked-alt w-5"></i> 區域管理
-            </a>
-            <a href="#" onclick="showPage('admin-reporters')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-users-cog w-5"></i> 提報人管理
-            </a>
-            <a href="#" onclick="showPage('admin-users')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-user-shield w-5"></i> 帳號管理
-            </a>
-            <a href="#" onclick="showPage('admin-logs')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-history w-5"></i> 操作紀錄
-            </a>
-            <a href="#" onclick="showPage('settings')" class="sidebar-item flex items-center gap-3 px-6 py-4 transition hover:bg-slate-800">
-                <i class="fas fa-sliders-h w-5"></i> 系統設定
-            </a>
+        <nav class="flex-1 space-y-2">
+            <a href="#" onclick="showPage('inspect')" class="sidebar-item active flex items-center gap-3 px-4 py-3 transition"><i class="fas fa-edit w-5"></i> 巡檢填報</a>
+            <a href="#" onclick="showPage('records')" class="sidebar-item flex items-center gap-3 px-4 py-3 transition"><i class="fas fa-table w-5"></i> 數據查詢</a>
+            <div class="pt-4 pb-2 border-t border-slate-700 mx-2 text-[10px] text-slate-500 font-bold uppercase">管理功能</div>
+            <a href="#" onclick="showPage('admin-areas')" class="sidebar-item flex items-center gap-3 px-4 py-3 transition"><i class="fas fa-map-marked-alt w-5"></i> 區域/地點管理</a>
+            <a href="#" onclick="showPage('admin-reporters')" class="sidebar-item flex items-center gap-3 px-4 py-3 transition"><i class="fas fa-users-cog w-5"></i> 提報人員管理</a>
+            <a href="#" onclick="showPage('settings')" class="sidebar-item flex items-center gap-3 px-4 py-3 transition"><i class="fas fa-cog w-5"></i> 系統串接設定</a>
         </nav>
-
-        <div class="p-4 bg-[#0f172a] flex items-center justify-between border-t border-slate-800">
-            <div>
-                <p class="font-bold text-slate-100 text-xs">系統管理員</p>
-                <span class="bg-slate-700 text-[10px] px-1.5 py-0.5 rounded text-slate-400">管理者</span>
-            </div>
-            <i class="fas fa-sign-out-alt text-slate-500 cursor-pointer hover:text-white"></i>
-        </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b px-8 py-4 flex justify-between items-center shadow-sm">
-            <h2 id="page-title" class="text-xl font-bold text-slate-800">儀表板</h2>
-            <div class="flex items-center gap-3">
-                <div class="text-right">
-                    <p class="text-xs text-slate-400">2026-03-19</p>
-                    <p class="text-sm font-medium text-slate-600">系統管理員 <span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-0.5 rounded-full ml-1">管理者</span></p>
+    <main class="flex-1 p-8 overflow-y-auto">
+        
+        <section id="page-inspect" class="max-w-xl mx-auto space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800 border-l-4 border-blue-500 pl-3">巡檢資料填寫</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">區域</label>
+                    <select id="sel-area" onchange="syncLocSelect()" class="w-full border p-3 rounded-xl bg-slate-50 outline-none"></select>
                 </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">具體地點</label>
+                    <select id="sel-loc" class="w-full border p-3 rounded-xl bg-slate-50 outline-none"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">巡檢人員</label>
+                    <select id="sel-reporter" class="w-full border p-3 rounded-xl bg-slate-50 outline-none"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">狀況說明</label>
+                    <textarea id="txt-note" class="w-full border p-3 rounded-xl bg-slate-50 h-24" placeholder="請輸入備註..."></textarea>
+                </div>
+                <button onclick="uploadToCloud()" id="btn-submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition">確認儲存並同步至雲端</button>
             </div>
-        </header>
+        </section>
 
-        <div class="p-8 overflow-y-auto flex-1">
-            
-            <section id="page-dashboard" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i class="fas fa-tasks"></i></div>
-                        </div>
-                        <p class="text-slate-500 text-sm">本週巡檢</p>
-                        <h3 class="text-3xl font-bold">8</h3>
-                    </div>
-                    </div>
-                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b flex justify-between items-center">
-                        <h4 class="font-bold">最近巡檢紀錄</h4>
-                        <button onclick="showPage('inspect')" class="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ 新增巡檢</button>
-                    </div>
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500">
-                            <tr>
-                                <th class="px-6 py-3">日期</th><th class="px-6 py-3">區域</th><th class="px-6 py-3">提報人</th><th class="px-6 py-3">進度</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y border-t">
-                            <tr>
-                                <td class="px-6 py-4">2026-03-15</td><td class="px-6 py-4">A廠 1F</td><td class="px-6 py-4">王大明</td>
-                                <td class="px-6 py-4"><span class="text-green-600 font-medium"><span class="status-dot bg-green-500"></span>已結案</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <section id="page-admin-areas" class="hidden-page max-w-4xl mx-auto space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800">區域與地點設定</h2>
+            <div class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="new-area" class="border p-2 rounded shadow-inner" placeholder="新增區域 (如: A廠 3F)">
+                    <button onclick="addArea()" class="bg-slate-800 text-white px-4 py-2 rounded shadow hover:bg-black">+ 新增區域</button>
                 </div>
-            </section>
+                <div id="area-editor-list" class="space-y-4 pt-4"></div>
+            </div>
+        </section>
 
-            <section id="page-records" class="hidden-page space-y-4">
-                <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-wrap gap-4 items-end">
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-xs text-slate-500 mb-1">搜尋地點、提報人...</label>
-                        <input type="text" class="w-full border rounded-lg p-2 text-sm bg-slate-50" placeholder="關鍵字...">
-                    </div>
-                    <select class="border rounded-lg p-2 text-sm bg-slate-50"><option>全部區域</option></select>
-                    <select class="border rounded-lg p-2 text-sm bg-slate-50"><option>全部進度</option></select>
-                    <div class="flex gap-2">
-                        <button class="bg-slate-100 px-4 py-2 rounded-lg text-sm border hover:bg-slate-200"><i class="fas fa-file-excel mr-2 text-green-600"></i>Excel</button>
-                        <button class="bg-slate-100 px-4 py-2 rounded-lg text-sm border hover:bg-slate-200"><i class="fas fa-file-pdf mr-2 text-red-600"></i>PDF</button>
-                    </div>
+        <section id="page-admin-reporters" class="hidden-page max-w-xl mx-auto space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800">人員名單管理</h2>
+            <div class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
+                <div class="flex gap-2">
+                    <input type="text" id="new-name" class="flex-1 border p-2 rounded" placeholder="輸入姓名">
+                    <button onclick="addName()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">新增</button>
                 </div>
-                <div class="bg-white rounded-xl border shadow-sm overflow-x-auto">
-                    <table class="w-full text-left text-sm min-w-[1000px]">
-                        <thead class="bg-slate-50 text-slate-500 uppercase font-medium">
-                            <tr>
-                                <th class="px-6 py-4">日期</th><th class="px-6 py-4">區域</th><th class="px-6 py-4">地點</th><th class="px-6 py-4">提報人</th><th class="px-6 py-4">狀態</th><th class="px-6 py-4">照片</th><th class="px-6 py-4">進度</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="px-6 py-4">2026-03-04</td><td class="px-6 py-4 font-medium">A廠 2F</td><td class="px-6 py-4">2F-1</td><td class="px-6 py-4 text-slate-600">李小華</td>
-                                <td class="px-6 py-4"><span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs">漏油</span></td>
-                                <td class="px-6 py-4 text-blue-500"><i class="fas fa-image"></i> 2</td>
-                                <td class="px-6 py-4"><span class="text-red-600 font-bold flex items-center"><span class="status-dot bg-red-500"></span>未改善</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                <ul id="name-list" class="divide-y"></ul>
+            </div>
+        </section>
 
-            <section id="page-admin-reporters" class="hidden-page max-w-4xl mx-auto space-y-6">
-                <div class="bg-white p-6 rounded-xl border shadow-sm">
-                    <h4 class="font-bold mb-4">新增提報人</h4>
-                    <div class="flex gap-4">
-                        <input type="text" id="new-reporter-name" class="flex-1 border rounded-lg p-2 bg-slate-50" placeholder="姓名">
-                        <button onclick="addReporter()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">+ 新增</button>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl border shadow-sm">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50"><tr><th class="px-6 py-4">姓名</th><th class="px-6 py-4">狀態</th><th class="px-6 py-4">操作</th></tr></thead>
-                        <tbody id="reporter-list" class="divide-y">
-                            <tr><td class="px-6 py-4">王大明</td><td class="px-6 py-4"><span class="bg-green-100 text-green-600 px-2 py-1 rounded text-xs">啟用</span></td><td class="px-6 py-4"><button class="text-slate-400 hover:text-red-500"><i class="fas fa-user-slash mr-1"></i>停用</button></td></tr>
-                        </tbody>
-                    </table>
-                    <p class="p-4 text-center text-xs text-slate-400 border-t">提報人僅可停用，不可刪除，以保留歷史紀錄完整性。</p>
-                </div>
-            </section>
+        <section id="page-settings" class="hidden-page max-w-xl mx-auto space-y-6">
+            <div class="bg-orange-50 border-l-4 border-orange-400 p-4">
+                <p class="text-orange-700 text-sm font-bold">⚠️ 系統提示：</p>
+                <p class="text-orange-600 text-xs">請將 Google Apps Script 部署後的網址貼在下方，方可使用同步功能。</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <label class="block text-sm font-bold mb-2 text-slate-700">Google API 網址</label>
+                <input type="text" id="input-api-url" onchange="saveConfig()" class="w-full border p-3 rounded-lg text-sm bg-slate-50" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+        </section>
 
-            <section id="page-inspect" class="hidden-page max-w-2xl mx-auto space-y-6">
-                <div class="bg-white rounded-xl border shadow-md p-6 space-y-6">
-                    <div class="flex justify-between items-center"><span class="font-bold text-lg">巡檢位置</span><span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full"><i class="fas fa-wifi"></i> 線上模式</span></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-xs text-slate-500 mb-1">區域 *</label><select id="inspect-area" onchange="updateLocations()" class="w-full border rounded-lg p-3 bg-slate-50"></select></div>
-                        <div><label class="block text-xs text-slate-500 mb-1">地點 *</label><select id="inspect-loc" class="w-full border rounded-lg p-3 bg-slate-50"></select></div>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-500 mb-2">巡檢結果</label>
-                        <div class="flex gap-4">
-                            <button id="btn-ok" onclick="setResult('正常')" class="flex-1 py-4 rounded-xl border-2 border-green-500 bg-green-50 text-green-700 font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-check-circle"></i> 正常</button>
-                            <button id="btn-err" onclick="setResult('異常')" class="flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-400 font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-exclamation-triangle"></i> 異常</button>
-                        </div>
-                    </div>
-                    <div><label class="block text-xs text-slate-500 mb-1">照片上傳</label><div class="border-2 border-dashed rounded-xl p-8 text-center bg-slate-50 text-slate-400 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition" onclick="document.getElementById('cam-input').click()"><i class="fas fa-camera text-3xl mb-2"></i><br>開啟相機 / 選擇檔案<input type="file" id="cam-input" class="hidden" multiple accept="image/*"></div></div>
-                    <button class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition">儲存並上傳巡檢資料</button>
-                </div>
-            </section>
-
-        </div>
     </main>
 
     <script>
-        // 資料設定
-        const siteData = {
-            'A廠': ['機台正面照', '1F保溫桶車道', '1F下料車道', '2F-1', '2F-平台', '3F-1', '4F-1'],
-            'B廠': ['機台正面照', '1F下料車道', '1F保溫桶車道', '2F-平台', '3F-1', '90-1'],
-            '打再生': ['平台1', '平台2']
+        // 初始化資料 (如果本地有存檔就讀取，沒有就用預設)
+        let config = JSON.parse(localStorage.getItem('ins_config')) || {
+            apiUrl: '',
+            reporters: ['王大明', '李小華'],
+            areas: {
+                'A廠 1F': ['機台正面照', '1F下料車道'],
+                'B廠 1F': ['1F保溫桶車道', '1F樓梯處']
+            }
         };
 
         function showPage(pageId) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden-page'));
             document.getElementById('page-' + pageId).classList.remove('hidden-page');
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if(pageId === 'admin-areas') renderAreaEditor();
+            if(pageId === 'admin-reporters') renderReporterList();
+            refreshSelects();
+        }
+
+        // --- 核心邏輯：管理人員 ---
+        function renderReporterList() {
+            const list = document.getElementById('name-list');
+            list.innerHTML = config.reporters.map((name, i) => `
+                <li class="py-3 flex justify-between items-center text-slate-700">
+                    <span>${name}</span>
+                    <button onclick="removeName(${i})" class="text-red-400 hover:text-red-600 text-sm">刪除</button>
+                </li>`).join('');
+        }
+        function addName() {
+            const val = document.getElementById('new-name').value;
+            if(val) { config.reporters.push(val); saveConfig(); renderReporterList(); document.getElementById('new-name').value=''; }
+        }
+        function removeName(i) { config.reporters.splice(i, 1); saveConfig(); renderReporterList(); }
+
+        // --- 核心邏輯：管理區域與地點 ---
+        function renderAreaEditor() {
+            const container = document.getElementById('area-editor-list');
+            container.innerHTML = Object.keys(config.areas).map(area => `
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <strong class="text-blue-600">${area}</strong>
+                        <button onclick="removeArea('${area}')" class="text-xs text-red-500 underline">刪除整個區域</button>
+                    </div>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="loc-for-${area}" class="flex-1 text-sm border p-1 rounded" placeholder="新增地點名稱">
+                        <button onclick="addLoc('${area}')" class="bg-green-500 text-white text-xs px-2 py-1 rounded">＋新增地點</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        ${config.areas[area].map((loc, i) => `<span class="bg-white border px-2 py-1 rounded-full text-xs flex items-center gap-1">${loc} <i onclick="removeLoc('${area}', ${i})" class="fas fa-times-circle text-slate-300 hover:text-red-500 cursor-pointer"></i></span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        function addArea() {
+            const val = document.getElementById('new-area').value;
+            if(val) { config.areas[val] = []; saveConfig(); renderAreaEditor(); document.getElementById('new-area').value=''; }
+        }
+        function removeArea(name) { if(confirm('確定刪除？')) { delete config.areas[name]; saveConfig(); renderAreaEditor(); } }
+        function addLoc(area) {
+            const val = document.getElementById('loc-for-'+area).value;
+            if(val) { config.areas[area].push(val); saveConfig(); renderAreaEditor(); }
+        }
+        function removeLoc(area, i) { config.areas[area].splice(i, 1); saveConfig(); renderAreaEditor(); }
+
+        // --- 儲存與同步 ---
+        function saveConfig() {
+            config.apiUrl = document.getElementById('input-api-url').value;
+            localStorage.setItem('ins_config', JSON.stringify(config));
+        }
+
+        function refreshSelects() {
+            document.getElementById('sel-area').innerHTML = Object.keys(config.areas).map(a => `<option>${a}</option>`).join('');
+            document.getElementById('sel-reporter').innerHTML = config.reporters.map(r => `<option>${r}</option>`).join('');
+            syncLocSelect();
+            document.getElementById('input-api-url').value = config.apiUrl;
+        }
+
+        function syncLocSelect() {
+            const area = document.getElementById('sel-area').value;
+            if(area) document.getElementById('sel-loc').innerHTML = config.areas[area].map(l => `<option>${l}</option>`).join('');
+        }
+
+        async function uploadToCloud() {
+            if(!config.apiUrl) return alert('請先到「系統串接設定」貼上 Google 網址');
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true; btn.innerText = '正在雲端同步...';
             
-            // 更新 UI 狀態
-            const navMap = {
-                'dashboard': '儀表板', 'inspect': '巡檢填報', 'records': '資料查詢',
-                'admin-areas': '區域管理', 'admin-reporters': '提報人管理',
-                'admin-users': '帳號管理', 'admin-logs': '操作紀錄', 'settings': '系統設定'
+            const data = {
+                area: document.getElementById('sel-area').value,
+                location: document.getElementById('sel-loc').value,
+                reporter: document.getElementById('sel-reporter').value,
+                note: document.getElementById('txt-note').value
             };
-            document.getElementById('page-title').innerText = navMap[pageId] || '系統';
-            document.querySelectorAll('.sidebar-item').forEach(el => {
-                el.classList.toggle('active', el.innerText.trim() === navMap[pageId]);
-            });
+
+            try {
+                await fetch(config.apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                alert('上傳成功！');
+                document.getElementById('txt-note').value = '';
+            } catch (e) {
+                alert('連線失敗，請檢查網路或網址。');
+            } finally {
+                btn.disabled = false; btn.innerText = '確認儲存並同步至雲端';
+            }
         }
 
-        function updateLocations() {
-            const area = document.getElementById('inspect-area').value;
-            const locSelect = document.getElementById('inspect-loc');
-            locSelect.innerHTML = siteData[area].map(l => `<option>${l}</option>`).join('');
-        }
-
-        function setResult(res) {
-            const isOk = res === '正常';
-            document.getElementById('btn-ok').className = isOk ? "flex-1 py-4 rounded-xl border-2 border-green-500 bg-green-50 text-green-700 font-bold flex items-center justify-center gap-2" : "flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-400 font-bold flex items-center justify-center gap-2";
-            document.getElementById('btn-err').className = !isOk ? "flex-1 py-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 font-bold flex items-center justify-center gap-2" : "flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-400 font-bold flex items-center justify-center gap-2";
-        }
-
-        // 初始化
-        window.onload = () => {
-            const areaSel = document.getElementById('inspect-area');
-            areaSel.innerHTML = Object.keys(siteData).map(a => `<option>${a}</option>`).join('');
-            updateLocations();
-        };
+        window.onload = refreshSelects;
     </script>
 </body>
 </html>
